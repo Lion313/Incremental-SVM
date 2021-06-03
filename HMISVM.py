@@ -109,7 +109,7 @@ class HMISVM:
         min_class, min_sv_idx = min_idx
         min_y = min_class * 2 - 1
         self.W = W[1 - min_class]
-        self.W *= self.place_changer * 2 / (np.linalg.norm(self.W) * min_dist)
+        self.W *= self.place_changer * np.sign(self.W[self.d - 1]) * 2 / (np.linalg.norm(self.W) * min_dist)
         self.b = min_y - self.sv[min_class][min_sv_idx] @ self.W
 
     def _find_hyperplane(self, Xs):

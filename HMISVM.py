@@ -94,23 +94,28 @@ class HMISVM:
         if not class_valid[0] and not class_valid[1]:
             class_valid = [True, True]
 
-        min_dist = np.inf
-        min_idx = (0, 0)
+        min_dist = [np.inf, np.inf]
+        min_idx = [(0, 0), (0, 0)]
         for i in range(2):
             if not class_valid[i]:
                 continue
 
             for j in range(self.d):
                 dist = np.abs(self.sv[1 - i][j] @ W[i] - 1) / np.linalg.norm(W[i])
-                if min_dist > dist:
-                    min_dist = dist
-                    min_idx = (1 - i, j)
+                if min_dist[i] > dist:
+                    min_dist[i] = dist
+                    min_idx[i] = (1 - i, j)
 
-        min_class, min_sv_idx = min_idx
-        min_y = min_class * 2 - 1
-        self.W = W[1 - min_class]
-        self.W *= self.place_changer * np.sign(self.W[self.d - 1]) * 2 / (np.linalg.norm(self.W) * min_dist)
-        self.b = min_y - self.sv[min_class][min_sv_idx] @ self.W
+        max_margin = -np.inf
+        for i in range(2):
+            if class_valid[i] and min_dist[i] > max_margin:
+                max_margin = min_dist[i]
+                max_class, max_sv_idx = min_idx[i]
+
+        max_y = max_class * 2 - 1
+        self.W = W[1 - max_class]
+        self.W *= self.place_changer * np.sign(self.W[self.d - 1]) * 2 / (np.linalg.norm(self.W) * max_margin)
+        self.b = max_y - self.sv[max_class][max_sv_idx] @ self.W
 
     def _find_hyperplane(self, Xs):
         """

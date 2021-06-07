@@ -107,6 +107,7 @@ class HMISVM:
                     min_idx[i] = (1 - i, j)
 
         max_margin = -np.inf
+        max_class, max_sv_idx = 0, 0
         for i in range(2):
             if class_valid[i] and min_dist[i] > max_margin:
                 max_margin = min_dist[i]
